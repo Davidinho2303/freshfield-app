@@ -1,12 +1,10 @@
 'use client'
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { HalmIcon } from '@/components/ui/HalmIcon'
 
 export default function LoginForm() {
-  const router = useRouter()
   const [email, setEmail] = useState('')
   const [code, setCode] = useState('')
   const [sent, setSent] = useState(false)
@@ -42,9 +40,7 @@ export default function LoginForm() {
       setError('Code ungültig oder abgelaufen.')
       setVerifying(false)
     } else {
-     } else {
-  window.location.href = '/feed'
-}
+      window.location.href = '/feed'
     }
   }
 
@@ -73,15 +69,10 @@ export default function LoginForm() {
               <p className="text-sm leading-relaxed mb-10" style={{ color: '#5a5855' }}>
                 Wir schicken dir einen 6-stelligen Code. Kein Passwort, kein Profil.
               </p>
-              <input
-                type="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && sendOtp()}
-                placeholder="deine@mail.de"
+              <input type="email" value={email} onChange={e => setEmail(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && sendOtp()} placeholder="deine@mail.de"
                 className="w-full bg-transparent border-b border-line py-2 text-base outline-none focus:border-ink transition-colors placeholder:text-soft mb-6"
-                autoFocus
-              />
+                autoFocus />
               {error && <p className="text-xs text-red-600 mb-4">{error}</p>}
               <button onClick={sendOtp} disabled={loading || !email.trim()}
                 className="btn-primary w-full disabled:opacity-40">
@@ -97,16 +88,12 @@ export default function LoginForm() {
               <p className="text-sm leading-relaxed mb-10" style={{ color: '#5a5855' }}>
                 Wir haben einen 6-stelligen Code an <strong>{email}</strong> geschickt.
               </p>
-              <input
-                type="text"
-                value={code}
+              <input type="text" value={code}
                 onChange={e => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
                 onKeyDown={e => e.key === 'Enter' && verifyOtp()}
                 placeholder="123456"
                 className="w-full bg-transparent border-b border-line py-2 text-2xl tracking-widest outline-none focus:border-ink transition-colors placeholder:text-soft mb-6 text-center"
-                autoFocus
-                maxLength={6}
-              />
+                autoFocus maxLength={6} />
               {error && <p className="text-xs text-red-600 mb-4">{error}</p>}
               <button onClick={verifyOtp} disabled={verifying || code.length !== 6}
                 className="btn-primary w-full disabled:opacity-40">
