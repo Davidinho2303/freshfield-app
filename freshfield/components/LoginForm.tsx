@@ -1,34 +1,49 @@
 'use client'
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { HalmIcon } from '@/components/ui/HalmIcon'
 
 export default function LoginForm() {
+  const router = useRouter()
   const [email, setEmail] = useState('')
+  const [code, setCode] = useState('')
   const [sent, setSent] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [verifying, setVerifying] = useState(false)
   const [error, setError] = useState('')
 
-  async function handleSubmit() {
+  async function sendOtp() {
     if (!email.trim()) return
     setLoading(true)
     setError('')
-
     const supabase = createClient()
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo: `${location.origin}/feed`,
-      },
-    })
-
+    const { error } = await supabase.auth.signInWithOtp({ email })
     if (error) {
       setError(error.message)
-      setLoading(false)
     } else {
       setSent(true)
-      setLoading(false)
+    }
+    setLoading(false)
+  }
+
+  async function verifyOtp() {
+    if (!code.trim()) return
+    setVerifying(true)
+    setError('')
+    const supabase = createClient()
+    const { error } = await supabase.auth.verifyOtp({
+      email,
+      token: code,
+      type: 'email',
+    })
+    if (error) {
+      setError('Code ungültig oder abgelaufen.')
+      setVerifying(false)
+    } else {
+      router.push('/feed')
+      router.refresh()
     }
   }
 
@@ -55,51 +70,52 @@ export default function LoginForm() {
                 <em className="text-soft">Sonst nichts.</em>
               </h1>
               <p className="text-sm leading-relaxed mb-10" style={{ color: '#5a5855' }}>
-                Kein Name, kein Passwort, kein Profil. Wir schicken dir einen Bestätigungslink — damit bist du drin.
+                Wir schicken dir einen 6-stelligen Code. Kein Passwort, kein Profil.
               </p>
-
-              <div className="mb-4">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && handleSubmit()}
-                  placeholder="deine@mail.de"
-                  className="input-base"
-                  autoFocus
-                />
-              </div>
-
-              {error && (
-                <p className="text-xs text-red-600 mb-4">{error}</p>
-              )}
-
-              <button
-                onClick={handleSubmit}
-                disabled={loading || !email.trim()}
-                className="btn-primary w-full mb-4 disabled:opacity-40"
-              >
-                {loading ? 'Wird gesendet…' : 'Bestätigungslink senden'}
+              <input
+                type="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && sendOtp()}
+                placeholder="deine@mail.de"
+                className="w-full bg-transparent border-b border-line py-2 text-base outline-none focus:border-ink transition-colors placeholder:text-soft mb-6"
+                autoFocus
+              />
+              {error && <p className="text-xs text-red-600 mb-4">{error}</p>}
+              <button onClick={sendOtp} disabled={loading || !email.trim()}
+                className="btn-primary w-full disabled:opacity-40">
+                {loading ? 'Wird gesendet…' : 'Code senden'}
               </button>
-
-              <p className="text-xs text-soft text-center leading-relaxed">
-                Mit dem Absenden stimmst du zu, dass wir dir einen einmaligen Bestätigungslink schicken. Kein Newsletter, kein Tracking.
-              </p>
             </>
           ) : (
-            <div className="text-center py-8">
-              <div className="text-3xl mb-4">✉</div>
-              <h2 className="font-serif text-2xl font-normal mb-3">Link ist unterwegs.</h2>
-              <p className="text-sm leading-relaxed" style={{ color: '#5a5855' }}>
-                Schau in dein Postfach — der Link ist 24 Stunden gültig.
+            <>
+              <h1 className="font-serif text-4xl font-normal leading-tight mb-3">
+                Code eingeben.<br />
+                <em className="text-soft">Dann bist du drin.</em>
+              </h1>
+              <p className="text-sm leading-relaxed mb-10" style={{ color: '#5a5855' }}>
+                Wir haben einen 6-stelligen Code an <strong>{email}</strong> geschickt.
               </p>
-              <button
-                onClick={() => setSent(false)}
-                className="mt-8 text-xs text-soft underline underline-offset-4 cursor-pointer bg-transparent border-none"
-              >
+              <input
+                type="text"
+                value={code}
+                onChange={e => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                onKeyDown={e => e.key === 'Enter' && verifyOtp()}
+                placeholder="123456"
+                className="w-full bg-transparent border-b border-line py-2 text-2xl tracking-widest outline-none focus:border-ink transition-colors placeholder:text-soft mb-6 text-center"
+                autoFocus
+                maxLength={6}
+              />
+              {error && <p className="text-xs text-red-600 mb-4">{error}</p>}
+              <button onClick={verifyOtp} disabled={verifying || code.length !== 6}
+                className="btn-primary w-full disabled:opacity-40">
+                {verifying ? 'Wird geprüft…' : 'Einloggen'}
+              </button>
+              <button onClick={() => { setSent(false); setCode(''); setError('') }}
+                className="mt-4 w-full text-xs text-soft underline underline-offset-4 bg-transparent border-none cursor-pointer">
                 Andere E-Mail verwenden
               </button>
-            </div>
+            </>
           )}
         </div>
       </main>
