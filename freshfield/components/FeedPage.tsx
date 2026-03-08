@@ -7,10 +7,10 @@ import FeedClient from '@/components/FeedClient'
 export default function FeedPage() {
   const router = useRouter()
   const [ready, setReady] = useState(false)
-  const [works, setWorks] = useState([])
+  const [works, setWorks] = useState<any[]>([])
   const [userId, setUserId] = useState('')
-  const [likedIds, setLikedIds] = useState([])
-  const [favoriteIds, setFavoriteIds] = useState([])
+  const [likedIds, setLikedIds] = useState<string[]>([])
+ const [favoriteIds, setFavoriteIds] = useState<string[]>([])
 
   useEffect(() => {
     async function load() {
