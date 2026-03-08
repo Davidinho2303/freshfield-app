@@ -23,7 +23,7 @@ Die Datei `.env.local` ist bereits mit deinen Supabase-Keys befüllt.
 2. Setze **Site URL** auf: `http://localhost:3000`
 3. Füge unter **Redirect URLs** hinzu: `http://localhost:3000/auth/callback`
 
-### 5. App starten
+### 5. App  starten
 ```bash
 npm run dev
 ```
