@@ -28,7 +28,7 @@ export default async function WerkPage({ params }: { params: { id: string } }) {
     .eq('work_id', work.id)
     .single() : { data: null }
 
-  const { data: likesCount } = await supabase
+  const { count: likesCount } = await supabase
     .from('work_likes')
     .select('*', { count: 'exact', head: true })
     .eq('work_id', work.id)
