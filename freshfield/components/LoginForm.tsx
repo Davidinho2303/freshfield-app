@@ -42,8 +42,9 @@ export default function LoginForm() {
       setError('Code ungültig oder abgelaufen.')
       setVerifying(false)
     } else {
-      router.push('/feed')
-      router.refresh()
+     } else {
+  window.location.href = '/feed'
+}
     }
   }
 
