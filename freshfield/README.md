@@ -14,7 +14,7 @@ cp .env.local.example .env.local
 Die Datei `.env.local` ist bereits mit deinen Supabase-Keys befüllt.
 
 ### 3. Datenbank einrichten
-1. Geh zu: https://supabase.com/dashboard/project/fdmiegoofvrvrxtpdzey/sql/new
+1. Gehe zu: https://supabase.com/dashboard/project/fdmiegoofvrvrxtpdzey/sql/new
 2. Kopiere den Inhalt von `supabase/migrations/001_initial.sql`
 3. Füge ihn im SQL-Editor ein und klicke **Run**
 
