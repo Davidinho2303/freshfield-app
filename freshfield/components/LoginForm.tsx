@@ -36,7 +36,7 @@ export default function LoginForm() {
     const { error } = await supabase.auth.verifyOtp({
       email,
       token: code,
-      type: 'email',
+      type: 'magiclink',
     })
     if (error) {
       setError('Code ungültig oder abgelaufen.')
