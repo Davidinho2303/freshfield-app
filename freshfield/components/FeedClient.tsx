@@ -60,23 +60,18 @@ export default function FeedClient({ initialWorks, favoriteIds, likedIds, userId
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg)' }}>
-      {/* Header */}
       <header className="sticky top-0 z-40 px-10 py-5 flex justify-between items-center border-b border-line backdrop-blur-md" style={{ background: 'rgba(247,245,242,.92)' }}>
-<Link href="/feed" className="flex items-center gap-2 no-underline">>
+        <Link href="/feed" className="flex items-center gap-2 no-underline">
           <HalmIcon variant="light" />
           <span className="logo-text text-ink">Freshfield</span>
         </Link>
-
-        {/* Menü */}
         <div className="relative" ref={menuRef}>
           <button
             onClick={() => setMenuOpen(!menuOpen)}
             className="text-xs text-soft tracking-widest uppercase hover:text-ink transition-colors flex items-center gap-2"
           >
-            Menü
-            <span style={{ fontSize: '8px' }}>{menuOpen ? '▲' : '▼'}</span>
+            Menü <span style={{ fontSize: '8px' }}>{menuOpen ? '▲' : '▼'}</span>
           </button>
-
           {menuOpen && (
             <div className="absolute right-0 top-8 border border-line z-50 min-w-[160px]" style={{ background: 'var(--bg)' }}>
               {userSlug && (
@@ -89,12 +84,14 @@ export default function FeedClient({ initialWorks, favoriteIds, likedIds, userId
                 </Link>
               )}
               {userSlug && (
-  <Link href="/upload"
-                onClick={() => setMenuOpen(false)}
-                className="block px-4 py-3 text-xs tracking-widest uppercase text-soft hover:text-ink hover:bg-line/30 transition-colors no-underline"
-              >
-                Werk hochladen
-              </Link>
+                <Link
+                  href="/upload"
+                  onClick={() => setMenuOpen(false)}
+                  className="block px-4 py-3 text-xs tracking-widest uppercase text-soft hover:text-ink hover:bg-line/30 transition-colors no-underline"
+                >
+                  Werk hochladen
+                </Link>
+              )}
               <div className="border-t border-line" />
               <button
                 onClick={signOut}
@@ -106,8 +103,6 @@ export default function FeedClient({ initialWorks, favoriteIds, likedIds, userId
           )}
         </div>
       </header>
-
-      {/* Filter bar */}
       <div className="px-10 py-3 border-b border-line flex gap-3 flex-wrap">
         <span className="text-xs text-soft self-center mr-2">{filtered.length} Werke</span>
         {(['all', 'image', 'audio', 'video'] as const).map(m => (
@@ -126,8 +121,6 @@ export default function FeedClient({ initialWorks, favoriteIds, likedIds, userId
           {pool === 'fav' ? '✓ Von Favorisierten' : 'Von Favorisierten'}
         </button>
       </div>
-
-      {/* Masonry grid */}
       {filtered.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-32 text-soft">
           <p className="font-serif text-2xl mb-3">Noch nichts hier.</p>
@@ -170,7 +163,7 @@ function WorkCard({ work, liked, onLike, delay }: { work: Work; liked: boolean; 
       )}
       <button
         onClick={(e) => { e.preventDefault(); onLike(work.id) }}
-        className={`absolute top-2.5 right-2.5 w-7 h-7 rounded-full flex items-center justify-center text-xs transition-all opacity-0 group-hover:opacity-100 ${liked ? 'bg-ink text-bg opacity-100' : 'bg-bg/85 text-ink'}`}
+        className={`absolute top-2.5 right-2.5 w-7 h-7 rounded-full flex items-center justify-center text-xs transition-all ${liked ? 'bg-ink text-bg' : 'bg-bg/85 text-ink'}`}
         style={{ opacity: liked ? 1 : undefined }}
         onMouseEnter={e => (e.currentTarget.style.opacity = '1')}
         onMouseLeave={e => { if (!liked) e.currentTarget.style.opacity = '0' }}
