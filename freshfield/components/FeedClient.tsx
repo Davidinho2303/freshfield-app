@@ -88,8 +88,8 @@ export default function FeedClient({ initialWorks, favoriteIds, likedIds, userId
                   Mein Profil
                 </Link>
               )}
-              <Link
-                href="/upload"
+              {userSlug && (
+  <Link href="/upload"
                 onClick={() => setMenuOpen(false)}
                 className="block px-4 py-3 text-xs tracking-widest uppercase text-soft hover:text-ink hover:bg-line/30 transition-colors no-underline"
               >
