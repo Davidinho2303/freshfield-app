@@ -16,8 +16,11 @@ export async function POST(req: Request) {
   const { data: existing } = await supabase.auth.admin.listUsers()
   const userExists = existing.users.find((u: any) => u.email === email)
   if (!userExists) {
-    await supabase.auth.admin.createUser({ email, email_confirm: true })
-  }
+    await supabase.auth.admin.createUser({ 
+  email, 
+  email_confirm: true,
+  user_metadata: { role: 'aussteller' }
+})
 
   await resend.emails.send({
     from: 'Freshfield <hallo@freshfield.de>',
