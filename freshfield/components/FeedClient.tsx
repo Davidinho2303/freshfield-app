@@ -1,5 +1,5 @@
 'use client'
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { HalmIcon } from '@/components/ui/HalmIcon'
@@ -10,15 +10,17 @@ interface Props {
   favoriteIds: string[]
   likedIds: string[]
   userId: string
+  userSlug?: string | null
 }
 
-export default function FeedClient({ initialWorks, favoriteIds, likedIds, userId }: Props) {
+export default function FeedClient({ initialWorks, favoriteIds, likedIds, userId, userSlug }: Props) {
   const [works] = useState<Work[]>(initialWorks)
   const [liked, setLiked] = useState<Set<string>>(new Set(likedIds))
   const [medium, setMedium] = useState<'all' | 'image' | 'audio' | 'video'>('all')
   const [pool, setPool] = useState<'all' | 'fav'>('all')
+  const [menuOpen, setMenuOpen] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
   const favSet = new Set(favoriteIds)
-
   const supabase = createClient()
 
   const filtered = works.filter(w => {
@@ -26,6 +28,16 @@ export default function FeedClient({ initialWorks, favoriteIds, likedIds, userId
     if (pool === 'fav' && w.profile_id && !favSet.has(w.profile_id)) return false
     return true
   })
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [])
 
   const toggleLike = useCallback(async (workId: string) => {
     const isLiked = liked.has(workId)
@@ -54,10 +66,44 @@ export default function FeedClient({ initialWorks, favoriteIds, likedIds, userId
           <HalmIcon variant="light" />
           <span className="logo-text text-ink">Freshfield</span>
         </Link>
-        <div className="flex items-center gap-6">
-          <button onClick={signOut} className="text-xs text-soft tracking-widest uppercase hover:text-ink transition-colors">
-            Ausloggen
+
+        {/* Menü */}
+        <div className="relative" ref={menuRef}>
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="text-xs text-soft tracking-widest uppercase hover:text-ink transition-colors flex items-center gap-2"
+          >
+            Menü
+            <span style={{ fontSize: '8px' }}>{menuOpen ? '▲' : '▼'}</span>
           </button>
+
+          {menuOpen && (
+            <div className="absolute right-0 top-8 border border-line z-50 min-w-[160px]" style={{ background: 'var(--bg)' }}>
+              {userSlug && (
+                <Link
+                  href={`/profil/${userSlug}`}
+                  onClick={() => setMenuOpen(false)}
+                  className="block px-4 py-3 text-xs tracking-widest uppercase text-soft hover:text-ink hover:bg-line/30 transition-colors no-underline"
+                >
+                  Mein Profil
+                </Link>
+              )}
+              <Link
+                href="/upload"
+                onClick={() => setMenuOpen(false)}
+                className="block px-4 py-3 text-xs tracking-widest uppercase text-soft hover:text-ink hover:bg-line/30 transition-colors no-underline"
+              >
+                Werk hochladen
+              </Link>
+              <div className="border-t border-line" />
+              <button
+                onClick={signOut}
+                className="w-full text-left px-4 py-3 text-xs tracking-widest uppercase text-soft hover:text-ink hover:bg-line/30 transition-colors"
+              >
+                Ausloggen
+              </button>
+            </div>
+          )}
         </div>
       </header>
 
@@ -100,7 +146,6 @@ export default function FeedClient({ initialWorks, favoriteIds, likedIds, userId
 
 function WorkCard({ work, liked, onLike, delay }: { work: Work; liked: boolean; onLike: (id: string) => void; delay: number }) {
   const isNew = work.published_at && Date.now() - new Date(work.published_at).getTime() < 7 * 24 * 60 * 60 * 1000
-
   return (
     <div className="feed-card card-in" style={{ animationDelay: `${delay * 0.04}s` }}>
       <Link href={`/werk/${work.id}`}>
