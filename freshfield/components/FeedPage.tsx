@@ -9,26 +9,28 @@ export default function FeedPage() {
   const [ready, setReady] = useState(false)
   const [works, setWorks] = useState<any[]>([])
   const [userId, setUserId] = useState('')
+  const [userSlug, setUserSlug] = useState<string | null>(null)
   const [likedIds, setLikedIds] = useState<string[]>([])
- const [favoriteIds, setFavoriteIds] = useState<string[]>([])
+  const [favoriteIds, setFavoriteIds] = useState<string[]>([])
 
   useEffect(() => {
     async function load() {
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/auth/login'); return }
-
       setUserId(user.id)
+
+      const { data: profile } = await supabase
+        .from('profiles').select('slug').eq('user_id', user.id).single()
+      setUserSlug(profile?.slug ?? null)
 
       const { data: works } = await supabase
         .from('works')
         .select('*, profile:profiles(id, slug, name, avatar_url)')
         .order('published_at', { ascending: false })
         .limit(60)
-
       const { data: likes } = await supabase
         .from('work_likes').select('work_id').eq('user_id', user.id)
-
       const { data: favs } = await supabase
         .from('favorites').select('profile_id').eq('user_id', user.id)
 
@@ -46,5 +48,5 @@ export default function FeedPage() {
     </div>
   )
 
-  return <FeedClient initialWorks={works} favoriteIds={favoriteIds} likedIds={likedIds} userId={userId} />
+  return <FeedClient initialWorks={works} favoriteIds={favoriteIds} likedIds={likedIds} userId={userId} userSlug={userSlug} />
 }
