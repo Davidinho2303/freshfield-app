@@ -62,7 +62,7 @@ export default function FeedClient({ initialWorks, favoriteIds, likedIds, userId
     <div className="min-h-screen" style={{ background: 'var(--bg)' }}>
       {/* Header */}
       <header className="sticky top-0 z-40 px-10 py-5 flex justify-between items-center border-b border-line backdrop-blur-md" style={{ background: 'rgba(247,245,242,.92)' }}>
-        <Link href="/" className="flex items-center gap-2 no-underline">
+<Link href="/feed" className="flex items-center gap-2 no-underline">>
           <HalmIcon variant="light" />
           <span className="logo-text text-ink">Freshfield</span>
         </Link>
