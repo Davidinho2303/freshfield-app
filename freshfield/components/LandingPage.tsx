@@ -39,7 +39,7 @@ export default function LandingPage() {
               <button className="btn-primary">Jetzt entdecken</button>
             </Link>
             <Link href="/bewerben">
-              <button className="btn-ghost">Ich möchte ausstellen →</button>
+             <Link href="/bewerben" className="btn-ghost">Ich möchte ausstellen →</Link>
             </Link>
           </div>
         </div>
