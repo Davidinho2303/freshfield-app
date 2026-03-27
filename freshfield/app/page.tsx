@@ -1,12 +1,15 @@
-import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+'use client'
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
 import LandingPage from '@/components/LandingPage'
 
-export default async function Home() {
-  const supabase = createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-
-  if (user) redirect('/feed')
-
+export default function Home() {
+  const router = useRouter()
+  useEffect(() => {
+    createClient().auth.getUser().then(({ data: { user } }) => {
+      if (user) router.push('/feed')
+    })
+  }, [])
   return <LandingPage />
 }
