@@ -119,8 +119,19 @@ export default function WerkClient({ work, comments: initComments, userId, isLik
                 {liked ? '♥' : '♡'}
               </button>
               <span className="text-xs text-soft">{count} mal geschätzt</span>
-              <button
-                onClick={() => navigator.clipboard?.writeText(window.location.href)}
+              <button onClick={() => {
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(window.location.href).then(() => alert('Link kopiert ✓'))
+  } else {
+    const el = document.createElement('input')
+    el.value = window.location.href
+    document.body.appendChild(el)
+    el.select()
+    document.execCommand('copy')
+    document.body.removeChild(el)
+    alert('Link kopiert ✓')
+  }
+}}
                 className="ml-auto text-xs tracking-widest uppercase px-4 py-2 border border-line text-soft hover:border-ink hover:text-ink transition-all"
               >
                 Teilen
