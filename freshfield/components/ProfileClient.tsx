@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { HalmIcon } from '@/components/ui/HalmIcon'
@@ -19,7 +19,12 @@ export default function ProfileClient({ profile, works, userId, isFavorited: ini
   const [nlOpen, setNlOpen] = useState(false)
   const [nlEmail, setNlEmail] = useState('')
   const [nlDone, setNlDone] = useState(false)
-  const supabase = createClient()
+  const supabase = createClient()const [userEmail, setUserEmail] = useState<string | null>(null)
+useEffect(() => {
+  supabase.auth.getUser().then(({ data: { user } }) => {
+    if (user?.email) setUserEmail(user.email)
+  })
+}, [])
 
   const imageWorks = works.filter(w => w.file_type === 'image')
   const audioWorks = works.filter(w => w.file_type === 'audio')
@@ -37,15 +42,14 @@ export default function ProfileClient({ profile, works, userId, isFavorited: ini
   }
 
   async function subscribeNewsletter() {
-    if (!nlEmail.trim()) return
-    await supabase.from('newsletter_subscriptions').upsert({
-      profile_id: profile.id,
-      email: nlEmail.trim(),
-      confirmed: false,
-    }, { onConflict: 'profile_id,email' })
-    setNlDone(true)
-    setMenuOpen(false)
-  }
+  const email = userEmail || nlEmail.trim()
+  if (!email) return
+  await supabase.from('newsletter_subscriptions').upsert({
+    profile_id: profile.id, email, confirmed: false,
+  }, { onConflict: 'profile_id,email' })
+  setNlDone(true)
+  setMenuOpen(false)
+}
 
   const displayedWorks = hasMultiple
     ? (tab === 'image' ? imageWorks : audioWorks)
@@ -116,16 +120,24 @@ export default function ProfileClient({ profile, works, userId, isFavorited: ini
                         className="w-full bg-transparent border-b border-line text-xs py-1.5 outline-none placeholder:text-soft"
                         autoFocus
                       />
-                      <button onClick={subscribeNewsletter} className="self-end text-xs tracking-widest uppercase bg-ink text-bg px-3 py-1.5">Abonnieren</button>
-                      <span className="text-[10px] text-soft">Kein Account nötig.</span>
-                    </div>
-                  )}
-                </>
-              ) : (
-                <div className="px-4 py-3 text-xs text-soft border-b border-line">
-                  ✓ Bestätigung kommt per Mail
-                </div>
-              )}
+                     <button onClick={() => userEmail ? subscribeNewsletter() : setNlOpen(o => !o)}
+  className="px-4 py-3 text-xs tracking-widest uppercase text-left border-b border-line hover:bg-black/5 transition-colors flex items-center gap-3 text-soft">
+  <span>✉</span> Newsletter
+</button>
+{nlOpen && !userEmail && (
+  <div className="px-4 py-3 border-b border-line flex flex-col gap-2">
+    <input type="email" value={nlEmail} onChange={e => setNlEmail(e.target.value)}
+      onKeyDown={e => e.key === 'Enter' && subscribeNewsletter()}
+      placeholder="deine@mail.de"
+      className="w-full bg-transparent border-b border-line text-xs py-1.5 outline-none placeholder:text-soft"
+      autoFocus />
+    <button onClick={subscribeNewsletter}
+      className="self-end text-xs tracking-widest uppercase bg-ink text-bg px-3 py-1.5">
+      Abonnieren
+    </button>
+    <span className="text-[10px] text-soft">Kein Account nötig.</span>
+  </div>
+)}
 
               {profile.website_url && (
                 <a href={profile.website_url} target="_blank" rel="noopener noreferrer"
