@@ -22,6 +22,12 @@ export default function FeedPage() {
 
       const { data: profile } = await supabase
         .from('profiles').select('slug').eq('user_id', user.id).single()
+
+      if (!profile && user.user_metadata?.role === 'aussteller') {
+        router.push('/profil/setup')
+        return
+      }
+
       setUserSlug(profile?.slug ?? null)
 
       const { data: works } = await supabase
@@ -39,34 +45,14 @@ export default function FeedPage() {
       setFavoriteIds((favs ?? []).map((f: any) => f.profile_id))
       setReady(true)
     }
- async function load() {
-  const supabase = createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) { router.push('/auth/login'); return }
-  setUserId(user.id)
+    load()
+  }, [])
 
-  const { data: profile } = await supabase
-    .from('profiles').select('slug').eq('user_id', user.id).single()
+  if (!ready) return (
+    <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg)' }}>
+      <p className="text-sm text-soft tracking-widest uppercase">Wird geladen…</p>
+    </div>
+  )
 
-  if (!profile && user.user_metadata?.role === 'aussteller') {
-    router.push('/profil/setup')
-    return
-  }
-
-  setUserSlug(profile?.slug ?? null)
-
-  const { data: works } = await supabase
-    .from('works')
-    .select('*, profile:profiles(id, slug, name, avatar_url)')
-    .order('published_at', { ascending: false })
-    .limit(60)
-  const { data: likes } = await supabase
-    .from('work_likes').select('work_id').eq('user_id', user.id)
-  const { data: favs } = await supabase
-    .from('favorites').select('profile_id').eq('user_id', user.id)
-
-  setWorks(works ?? [])
-  setLikedIds((likes ?? []).map((l: any) => l.work_id))
-  setFavoriteIds((favs ?? []).map((f: any) => f.profile_id))
-  setReady(true)
+  return <FeedClient initialWorks={works} favoriteIds={favoriteIds} likedIds={likedIds} userId={userId} userSlug={userSlug} />
 }
