@@ -8,7 +8,6 @@ export async function POST(req: Request) {
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
   const resend = new Resend(process.env.RESEND_API_KEY)
-
   const { applicationId, email } = await req.json()
 
   await supabase.from('applications').update({ status: 'approved' }).eq('id', applicationId)
@@ -16,11 +15,12 @@ export async function POST(req: Request) {
   const { data: existing } = await supabase.auth.admin.listUsers()
   const userExists = existing.users.find((u: any) => u.email === email)
   if (!userExists) {
-    await supabase.auth.admin.createUser({ 
-  email, 
-  email_confirm: true,
-  user_metadata: { role: 'aussteller' }
-})
+    await supabase.auth.admin.createUser({
+      email,
+      email_confirm: true,
+      user_metadata: { role: 'aussteller' }
+    })
+  }
 
   await resend.emails.send({
     from: 'Freshfield <hallo@freshfield.de>',
@@ -29,8 +29,9 @@ export async function POST(req: Request) {
     html: `
       <p>Hallo,</p>
       <p>deine Bewerbung bei Freshfield wurde angenommen.</p>
-      <p>Du kannst dich jetzt einloggen und dein Profil einrichten:</p>
-      <p><a href="https://freshfield-app.vercel.app/auth/login">Jetzt einloggen →</a></p>
+      <p>Logge dich ein und richte danach dein Profil ein:</p>
+      <p><a href="https://freshfield-app.vercel.app/auth/login">1. Einloggen →</a></p>
+      <p><a href="https://freshfield-app.vercel.app/profil/setup">2. Profil einrichten →</a></p>
       <p>Freshfield</p>
     `
   })
