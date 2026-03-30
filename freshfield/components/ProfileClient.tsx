@@ -53,6 +53,11 @@ export default function ProfileClient({ profile, works, userId, isFavorited: ini
     setMenuOpen(false)
   }
 
+  async function signOut() {
+    await supabase.auth.signOut()
+    window.location.href = '/'
+  }
+
   const displayedWorks = hasMultiple ? (tab === 'image' ? imageWorks : audioWorks) : works
 
   return (
@@ -62,7 +67,14 @@ export default function ProfileClient({ profile, works, userId, isFavorited: ini
           <HalmIcon variant="light" />
           <span className="logo-text text-ink">Freshfield</span>
         </Link>
-        <Link href="/feed" className="text-xs text-soft tracking-widest uppercase hover:text-ink transition-colors">← Entdecken</Link>
+        <div className="flex items-center gap-8">
+          <Link href="/feed" className="text-xs text-soft tracking-widest uppercase hover:text-ink transition-colors">← Entdecken</Link>
+          {userId && (
+            <button onClick={signOut} className="text-xs text-soft tracking-widest uppercase hover:text-ink transition-colors">
+              Ausloggen
+            </button>
+          )}
+        </div>
       </header>
 
       <div className="px-10 pt-12 pb-0 flex items-start gap-8">
@@ -80,42 +92,31 @@ export default function ProfileClient({ profile, works, userId, isFavorited: ini
         </div>
 
         <div className="relative pt-1 flex-shrink-0">
-          <button
-            onClick={() => setMenuOpen(o => !o)}
-            className="text-xs tracking-widest uppercase px-4 py-2 border border-line text-soft hover:border-ink hover:text-ink transition-all flex items-center gap-2"
-          >
+          <button onClick={() => setMenuOpen(o => !o)}
+            className="text-xs tracking-widest uppercase px-4 py-2 border border-line text-soft hover:border-ink hover:text-ink transition-all flex items-center gap-2">
             Behalten <span className="text-[8px]">▾</span>
           </button>
           {menuOpen && (
             <div className="absolute right-0 top-full mt-1 bg-bg border border-line shadow-lg z-50 min-w-[220px] flex flex-col">
-              <button
-                onClick={toggleFavorite}
+              <button onClick={toggleFavorite}
                 className="px-4 py-3 text-xs tracking-widest uppercase text-left border-b border-line hover:bg-black/5 transition-colors flex items-center gap-3"
-                style={{ color: favorited ? 'var(--g1)' : 'var(--soft)' }}
-              >
+                style={{ color: favorited ? 'var(--g1)' : 'var(--soft)' }}>
                 <span>{favorited ? '♥' : '♡'}</span>
                 {favorited ? 'Favorisiert' : 'Favorisieren'}
               </button>
-
               {!nlDone ? (
                 <>
-                  <button
-                    onClick={() => userEmail ? subscribeNewsletter() : setNlOpen(o => !o)}
-                    className="px-4 py-3 text-xs tracking-widest uppercase text-left border-b border-line hover:bg-black/5 transition-colors flex items-center gap-3 text-soft"
-                  >
+                  <button onClick={() => userEmail ? subscribeNewsletter() : setNlOpen(o => !o)}
+                    className="px-4 py-3 text-xs tracking-widest uppercase text-left border-b border-line hover:bg-black/5 transition-colors flex items-center gap-3 text-soft">
                     <span>✉</span> Newsletter
                   </button>
                   {nlOpen && !userEmail && (
                     <div className="px-4 py-3 border-b border-line flex flex-col gap-2">
-                      <input
-                        type="email"
-                        value={nlEmail}
-                        onChange={e => setNlEmail(e.target.value)}
+                      <input type="email" value={nlEmail} onChange={e => setNlEmail(e.target.value)}
                         onKeyDown={e => e.key === 'Enter' && subscribeNewsletter()}
                         placeholder="deine@mail.de"
                         className="w-full bg-transparent border-b border-line text-xs py-1.5 outline-none placeholder:text-soft"
-                        autoFocus
-                      />
+                        autoFocus />
                       <button onClick={subscribeNewsletter} className="self-end text-xs tracking-widest uppercase bg-ink text-bg px-3 py-1.5">
                         Abonnieren
                       </button>
@@ -128,7 +129,6 @@ export default function ProfileClient({ profile, works, userId, isFavorited: ini
                   ✓ Bestätigung kommt per Mail
                 </div>
               )}
-
               {profile.website_url && (
                 <a href={profile.website_url} target="_blank" rel="noopener noreferrer"
                   className="px-4 py-3 text-xs tracking-widest uppercase text-left hover:bg-black/5 transition-colors flex items-center gap-3 text-soft no-underline">
