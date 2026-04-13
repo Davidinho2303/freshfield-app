@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { NewsletterBlock, NewsletterBlockType, Profile, Work } from '@/lib/types'
 import { HalmIcon } from '@/components/ui/HalmIcon'
-import { BlockEditor, BlockPreview } from '@/components/NewsletterBlocks'
+import { BlockEditor, BlockPreview } from '@/components/NewsletterEditor'
 
 function generateId() {
   return Math.random().toString(36).slice(2, 9)
