@@ -296,4 +296,135 @@ function BlockEditor({ block, idx, total, works, claudeLoading, onUpdate, onMove
             {claudeLoading ? '…' : '✦ Vorschlag'}
           </button>
           <button onClick={() => onMove(-1)} disabled={idx === 0} className="text-[#9a9690] hover:text-[#1a1a18] disabled:opacity-20 text-sm px-1">↑</button>
-          <button onClick={() => onMove(1)} disabled={idx === total - 1} className="text-[
+          <button onClick={() => onMove(1)} disabled={idx === total - 1} className="text-[#9a9690] hover:text-[#1a1a18] disabled:opacity-20 text-sm px-1">↓</button>
+          <button onClick={onRemove} className="text-[#9a9690] hover:text-red-400 text-sm px-1">×</button>
+        </div>
+      </div>
+
+      {block.type === 'divider' && (
+        <p className="text-xs text-[#c5c0ba]">— Trennlinie —</p>
+      )}
+
+      {(block.type === 'text' || block.type === 'h1' || block.type === 'h2' || block.type === 'quote') && (
+        <textarea
+          value={block.content ?? ''}
+          onChange={e => onUpdate({ content: e.target.value })}
+          placeholder={block.type === 'quote' ? 'Zitat…' : 'Text…'}
+          rows={block.type === 'text' ? 4 : 2}
+          className="w-full bg-[#faf9f7] border border-[#e8e4de] px-3 py-2 text-sm text-[#1a1a18] outline-none focus:border-[#2d6a2d] resize-none placeholder-[#c5c0ba]"
+        />
+      )}
+
+      {block.type === 'list' && (
+        <div className="space-y-2">
+          {(block.items ?? ['']).map((item, i) => (
+            <div key={i} className="flex gap-2">
+              <input
+                value={item}
+                onChange={e => {
+                  const items = [...(block.items ?? [])]
+                  items[i] = e.target.value
+                  onUpdate({ items })
+                }}
+                placeholder={`Punkt ${i + 1}…`}
+                className="flex-1 bg-[#faf9f7] border border-[#e8e4de] px-3 py-1.5 text-sm text-[#1a1a18] outline-none focus:border-[#2d6a2d] placeholder-[#c5c0ba]"
+              />
+              <button
+                onClick={() => {
+                  const items = (block.items ?? []).filter((_, j) => j !== i)
+                  onUpdate({ items: items.length ? items : [''] })
+                }}
+                className="text-[#9a9690] hover:text-red-400 text-sm px-1"
+              >×</button>
+            </div>
+          ))}
+          <button
+            onClick={() => onUpdate({ items: [...(block.items ?? []), ''] })}
+            className="text-xs text-[#2d6a2d] hover:underline"
+          >+ Punkt hinzufügen</button>
+        </div>
+      )}
+
+      {block.type === 'button' && (
+        <div className="space-y-2">
+          <input value={block.label ?? ''} onChange={e => onUpdate({ label: e.target.value })} placeholder="Button-Text…" className="w-full bg-[#faf9f7] border border-[#e8e4de] px-3 py-1.5 text-sm text-[#1a1a18] outline-none focus:border-[#2d6a2d] placeholder-[#c5c0ba]" />
+          <input value={block.url ?? ''} onChange={e => onUpdate({ url: e.target.value })} placeholder="URL…" className="w-full bg-[#faf9f7] border border-[#e8e4de] px-3 py-1.5 text-sm text-[#1a1a18] outline-none focus:border-[#2d6a2d] placeholder-[#c5c0ba]" />
+        </div>
+      )}
+
+      {block.type === 'image' && (
+        <div className="space-y-2">
+          <input value={block.src ?? ''} onChange={e => onUpdate({ src: e.target.value })} placeholder="Bild-URL…" className="w-full bg-[#faf9f7] border border-[#e8e4de] px-3 py-1.5 text-sm text-[#1a1a18] outline-none focus:border-[#2d6a2d] placeholder-[#c5c0ba]" />
+          <input value={block.caption ?? ''} onChange={e => onUpdate({ caption: e.target.value })} placeholder="Bildunterschrift…" className="w-full bg-[#faf9f7] border border-[#e8e4de] px-3 py-1.5 text-sm text-[#1a1a18] outline-none focus:border-[#2d6a2d] placeholder-[#c5c0ba]" />
+        </div>
+      )}
+
+      {block.type === 'work' && (
+        <select
+          value={block.work_id ?? ''}
+          onChange={e => onUpdate({ work_id: e.target.value })}
+          className="w-full bg-[#faf9f7] border border-[#e8e4de] px-3 py-1.5 text-sm text-[#1a1a18] outline-none focus:border-[#2d6a2d]"
+        >
+          <option value="">Werk wählen…</option>
+          {works.map(w => (
+            <option key={w.id} value={w.id}>{w.title ?? 'Ohne Titel'} ({w.year ?? '—'})</option>
+          ))}
+        </select>
+      )}
+
+      {block.type === 'video' && (
+        <input value={block.video_url ?? ''} onChange={e => onUpdate({ video_url: e.target.value })} placeholder="YouTube oder Vimeo URL…" className="w-full bg-[#faf9f7] border border-[#e8e4de] px-3 py-1.5 text-sm text-[#1a1a18] outline-none focus:border-[#2d6a2d] placeholder-[#c5c0ba]" />
+      )}
+    </div>
+  )
+}
+
+function BlockPreview({ block, works }: { block: NewsletterBlock; works: Work[] }) {
+  switch (block.type) {
+    case 'h1': return <h1 className="text-2xl font-light text-[#1a1a18] mb-4">{block.content || <span className="text-[#c5c0ba]">Überschrift 1</span>}</h1>
+    case 'h2': return <h2 className="text-lg font-light text-[#1a1a18] mb-3">{block.content || <span className="text-[#c5c0ba]">Überschrift 2</span>}</h2>
+    case 'text': return <p className="text-sm text-[#3a3835] mb-4 leading-relaxed">{block.content || <span className="text-[#c5c0ba]">Text…</span>}</p>
+    case 'quote': return <blockquote className="border-l-2 border-[#2d6a2d] pl-4 mb-4 italic text-sm text-[#5a5855]">{block.content || <span className="text-[#c5c0ba]">Zitat…</span>}</blockquote>
+    case 'divider': return <hr className="border-[#e8e4de] my-4" />
+    case 'list': return (
+      <ul className="mb-4 space-y-1">
+        {(block.items ?? []).filter(Boolean).map((item, i) => (
+          <li key={i} className="text-sm text-[#3a3835] flex gap-2"><span className="text-[#2d6a2d]">—</span>{item}</li>
+        ))}
+      </ul>
+    )
+    case 'button': return (
+      <div className="mb-4">
+        <span className="inline-block border border-[#2d6a2d] text-[#2d6a2d] text-xs uppercase tracking-widest px-4 py-2">
+          {block.label || 'Button'}
+        </span>
+      </div>
+    )
+    case 'image': return (
+      <div className="mb-4">
+        {block.src ? <img src={block.src} alt={block.caption ?? ''} className="w-full" /> : <div className="bg-[#f0ede8] h-32 flex items-center justify-center text-xs text-[#c5c0ba]">Bild</div>}
+        {block.caption && <p className="text-xs text-[#9a9690] mt-1">{block.caption}</p>}
+      </div>
+    )
+    case 'work': {
+      const work = works.find(w => w.id === block.work_id)
+      return (
+        <div className="mb-4 border border-[#e8e4de] p-3">
+          {work ? (
+            <>
+              {work.thumbnail_url && <img src={work.thumbnail_url} alt={work.title ?? ''} className="w-full h-24 object-cover mb-2" />}
+              <p className="text-sm font-medium text-[#1a1a18]">{work.title}</p>
+              <p className="text-xs text-[#9a9690]">{work.medium} · {work.year}</p>
+            </>
+          ) : <p className="text-xs text-[#c5c0ba]">Werk wählen…</p>}
+        </div>
+      )
+    }
+    case 'video': return (
+      <div className="mb-4 bg-[#f0ede8] h-24 flex items-center justify-center text-xs text-[#9a9690]">
+        {block.video_url ? block.video_url : 'Video URL…'}
+      </div>
+    )
+    default: return null
+  }
+}
