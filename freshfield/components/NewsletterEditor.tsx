@@ -162,7 +162,7 @@ Antworte nur mit dem Text, keine Erklärung.`
       <header className="border-b border-[#e8e4de] bg-[#f7f5f2] sticky top-0 z-10">
         <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <HalmIcon className="w-4 h-7" />
+           <HalmIcon size={16} />
             <span className="text-xs uppercase tracking-widest text-[#9a9690]">Newsletter</span>
           </div>
           <button
