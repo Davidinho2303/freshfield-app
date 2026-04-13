@@ -55,3 +55,48 @@ export interface WorkLike {
   work_id: string
   created_at: string
 }
+
+// Newsletter
+
+export type NewsletterBlockType =
+  | 'text'
+  | 'h1'
+  | 'h2'
+  | 'list'
+  | 'quote'
+  | 'divider'
+  | 'button'
+  | 'image'
+  | 'work'
+  | 'video'
+
+export interface NewsletterBlock {
+  id: string
+  type: NewsletterBlockType
+  // text, h1, h2, quote
+  content?: string
+  // list
+  items?: string[]
+  // button
+  label?: string
+  url?: string
+  // image
+  src?: string
+  caption?: string
+  // work (eingebettetes eigenes Werk)
+  work_id?: string
+  // video (YouTube/Vimeo URL)
+  video_url?: string
+}
+
+export interface Newsletter {
+  id: string
+  profile_id: string
+  subject: string
+  blocks: NewsletterBlock[]
+  status: 'draft' | 'scheduled' | 'sent'
+  scheduled_for: string | null
+  sent_at: string | null
+  created_at: string
+  updated_at: string
+}
