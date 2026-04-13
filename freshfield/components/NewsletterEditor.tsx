@@ -95,9 +95,7 @@ export default function NewsletterEditor() {
     if (!profile) return
     setClaudeLoading(block.id)
     try {
-      const workContext = block.work_id
-        ? works.find(w => w.id === block.work_id)
-        : null
+      const workContext = block.work_id ? works.find(w => w.id === block.work_id) : null
 
       const prompt = `Du bist Assistent für Künstler auf der Plattform Freshfield.
 Aussteller: ${profile.name}
@@ -272,7 +270,7 @@ Antworte nur mit dem Text, keine Erklärung.`
   )
 }
 
-function BlockEditor({ block, idx, total, works, claudeLoading, onUpdate, onMove, onRemove, onSuggest }: {
+export function BlockEditor({ block, idx, total, works, claudeLoading, onUpdate, onMove, onRemove, onSuggest }: {
   block: NewsletterBlock
   idx: number
   total: number
@@ -379,7 +377,7 @@ function BlockEditor({ block, idx, total, works, claudeLoading, onUpdate, onMove
   )
 }
 
-function BlockPreview({ block, works }: { block: NewsletterBlock; works: Work[] }) {
+export function BlockPreview({ block, works }: { block: NewsletterBlock; works: Work[] }) {
   switch (block.type) {
     case 'h1': return <h1 className="text-2xl font-light text-[#1a1a18] mb-4">{block.content || <span className="text-[#c5c0ba]">Überschrift 1</span>}</h1>
     case 'h2': return <h2 className="text-lg font-light text-[#1a1a18] mb-3">{block.content || <span className="text-[#c5c0ba]">Überschrift 2</span>}</h2>
