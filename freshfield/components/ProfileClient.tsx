@@ -23,6 +23,7 @@ export default function ProfileClient({ profile, works, userId, isFavorited: ini
   const [userEmail, setUserEmail] = useState<string | null>(null)
   const [isOwner, setIsOwner] = useState(false)
   const [drafts, setDrafts] = useState<Newsletter[]>([])
+  const [tab, setTab] = useState<'image' | 'audio'>('image')
   const supabase = createClient()
 
   useEffect(() => {
@@ -30,7 +31,6 @@ export default function ProfileClient({ profile, works, userId, isFavorited: ini
       if (user?.email) setUserEmail(user.email)
       if (user && userId === user.id) {
         setIsOwner(true)
-        // Entwürfe laden
         supabase
           .from('newsletters')
           .select('*')
@@ -45,7 +45,7 @@ export default function ProfileClient({ profile, works, userId, isFavorited: ini
   const imageWorks = works.filter(w => w.file_type === 'image')
   const audioWorks = works.filter(w => w.file_type === 'audio')
   const hasMultiple = imageWorks.length > 0 && audioWorks.length > 0
-  const [tab, setTab] = useState<'image' | 'audio'>('image')
+  const displayedWorks = hasMultiple ? (tab === 'image' ? imageWorks : audioWorks) : works
 
   async function toggleFavorite() {
     if (!userId) { window.location.href = '/auth/login'; return }
@@ -80,8 +80,6 @@ export default function ProfileClient({ profile, works, userId, isFavorited: ini
     setDrafts(prev => prev.filter(d => d.id !== id))
   }
 
-  const displayedWorks = hasMultiple ? (tab === 'image' ? imageWorks : audioWorks) : works
-
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg)', color: 'var(--ink)' }}>
       <header className="sticky top-0 z-40 px-10 py-5 flex justify-between items-center border-b border-line backdrop-blur-md" style={{ background: 'rgba(247,245,242,.85)' }}>
@@ -113,60 +111,33 @@ export default function ProfileClient({ profile, works, userId, isFavorited: ini
           <div className="text-xs text-soft tracking-wide">{works.length} Werke · {subscriberCount} Newsletter-Abonnenten</div>
         </div>
         <div className="relative pt-1 flex-shrink-0">
-          <button
-            onClick={() => setMenuOpen(o => !o)}
-            className="text-xs tracking-widest uppercase px-4 py-2 border border-line text-soft hover:border-ink hover:text-ink transition-all flex items-center gap-2"
-          >
+          <button onClick={() => setMenuOpen(o => !o)} className="text-xs tracking-widest uppercase px-4 py-2 border border-line text-soft hover:border-ink hover:text-ink transition-all flex items-center gap-2">
             Behalten <span className="text-[8px]">▾</span>
           </button>
           {menuOpen && (
             <div className="absolute right-0 top-full mt-1 bg-bg border border-line shadow-lg z-50 min-w-[220px] flex flex-col">
-              <button
-                onClick={toggleFavorite}
-                className="px-4 py-3 text-xs tracking-widest uppercase text-left border-b border-line hover:bg-black/5 transition-colors flex items-center gap-3"
-                style={{ color: favorited ? 'var(--g1)' : 'var(--soft)' }}
-              >
+              <button onClick={toggleFavorite} className="px-4 py-3 text-xs tracking-widest uppercase text-left border-b border-line hover:bg-black/5 transition-colors flex items-center gap-3" style={{ color: favorited ? 'var(--g1)' : 'var(--soft)' }}>
                 <span>{favorited ? '♥' : '♡'}</span>
                 {favorited ? 'Favorisiert' : 'Favorisieren'}
               </button>
               {!nlDone ? (
                 <>
-                  <button
-                    onClick={() => userEmail ? subscribeNewsletter() : setNlOpen(o => !o)}
-                    className="px-4 py-3 text-xs tracking-widest uppercase text-left border-b border-line hover:bg-black/5 transition-colors flex items-center gap-3 text-soft"
-                  >
+                  <button onClick={() => userEmail ? subscribeNewsletter() : setNlOpen(o => !o)} className="px-4 py-3 text-xs tracking-widest uppercase text-left border-b border-line hover:bg-black/5 transition-colors flex items-center gap-3 text-soft">
                     <span>✉</span> Newsletter
                   </button>
                   {nlOpen && !userEmail && (
                     <div className="px-4 py-3 border-b border-line flex flex-col gap-2">
-                      <input
-                        type="email"
-                        value={nlEmail}
-                        onChange={e => setNlEmail(e.target.value)}
-                        onKeyDown={e => e.key === 'Enter' && subscribeNewsletter()}
-                        placeholder="deine@mail.de"
-                        className="w-full bg-transparent border-b border-line text-xs py-1.5 outline-none placeholder:text-soft"
-                        autoFocus
-                      />
-                      <button onClick={subscribeNewsletter} className="self-end text-xs tracking-widest uppercase bg-ink text-bg px-3 py-1.5">
-                        Abonnieren
-                      </button>
+                      <input type="email" value={nlEmail} onChange={e => setNlEmail(e.target.value)} onKeyDown={e => e.key === 'Enter' && subscribeNewsletter()} placeholder="deine@mail.de" className="w-full bg-transparent border-b border-line text-xs py-1.5 outline-none placeholder:text-soft" autoFocus />
+                      <button onClick={subscribeNewsletter} className="self-end text-xs tracking-widest uppercase bg-ink text-bg px-3 py-1.5">Abonnieren</button>
                       <span className="text-[10px] text-soft">Kein Account nötig.</span>
                     </div>
                   )}
                 </>
               ) : (
-                <div className="px-4 py-3 text-xs text-soft border-b border-line">
-                  ✓ Bestätigung kommt per Mail
-                </div>
+                <div className="px-4 py-3 text-xs text-soft border-b border-line">✓ Bestätigung kommt per Mail</div>
               )}
               {profile.website_url && (
-                
-                  href={profile.website_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-4 py-3 text-xs tracking-widest uppercase text-left hover:bg-black/5 transition-colors flex items-center gap-3 text-soft no-underline"
-                >
+                <a href={profile.website_url} target="_blank" rel="noopener noreferrer" className="px-4 py-3 text-xs tracking-widest uppercase text-left hover:bg-black/5 transition-colors flex items-center gap-3 text-soft no-underline">
                   <span>↗</span> Website
                 </a>
               )}
@@ -175,17 +146,11 @@ export default function ProfileClient({ profile, works, userId, isFavorited: ini
         </div>
       </div>
 
-      {/* Entwürfe — nur für Aussteller selbst */}
       {isOwner && (
         <div className="px-10 mt-10">
           <div className="flex items-center justify-between mb-4">
             <span className="text-xs uppercase tracking-widest text-soft">Newsletter</span>
-            <Link
-              href="/newsletter/neu"
-              className="text-xs uppercase tracking-widest text-[#2d6a2d] border border-[#2d6a2d] px-3 py-1.5 hover:bg-[#2d6a2d] hover:text-white transition-colors no-underline"
-            >
-              + Neu
-            </Link>
+            <Link href="/newsletter/neu" className="text-xs uppercase tracking-widest text-[#2d6a2d] border border-[#2d6a2d] px-3 py-1.5 hover:bg-[#2d6a2d] hover:text-white transition-colors no-underline">+ Neu</Link>
           </div>
           {drafts.length === 0 ? (
             <p className="text-xs text-soft italic pb-6 border-b border-line">Noch keine Entwürfe.</p>
@@ -202,18 +167,8 @@ export default function ProfileClient({ profile, works, userId, isFavorited: ini
                     </p>
                   </div>
                   <div className="flex items-center gap-3">
-                    <Link
-                      href={`/newsletter/${draft.id}/bearbeiten`}
-                      className="text-xs uppercase tracking-widest text-[#2d6a2d] hover:underline no-underline"
-                    >
-                      Bearbeiten
-                    </Link>
-                    <button
-                      onClick={() => deleteDraft(draft.id)}
-                      className="text-xs text-[#9a9690] hover:text-red-400 transition-colors"
-                    >
-                      ×
-                    </button>
+                    <Link href={`/newsletter/${draft.id}/bearbeiten`} className="text-xs uppercase tracking-widest text-[#2d6a2d] hover:underline no-underline">Bearbeiten</Link>
+                    <button onClick={() => deleteDraft(draft.id)} className="text-xs text-[#9a9690] hover:text-red-400 transition-colors">×</button>
                   </div>
                 </div>
               ))}
@@ -225,11 +180,7 @@ export default function ProfileClient({ profile, works, userId, isFavorited: ini
       {hasMultiple && (
         <div className="flex gap-0 px-10 mt-8 border-b border-line">
           {(['image', 'audio'] as const).map(t => (
-            <button
-              key={t}
-              onClick={() => setTab(t)}
-              className={`pb-3 mr-6 text-xs tracking-widest uppercase transition-all border-b-2 ${tab === t ? 'border-ink text-ink' : 'border-transparent text-soft hover:text-ink'}`}
-            >
+            <button key={t} onClick={() => setTab(t)} className={`pb-3 mr-6 text-xs tracking-widest uppercase transition-all border-b-2 ${tab === t ? 'border-ink text-ink' : 'border-transparent text-soft hover:text-ink'}`}>
               {t === 'image' ? `Visuell (${imageWorks.length})` : `Audio (${audioWorks.length})`}
             </button>
           ))}
