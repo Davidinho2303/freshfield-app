@@ -1,4 +1,5 @@
 'use client'
+
 import { useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
@@ -54,8 +55,12 @@ export default function WerkClient({ work, comments: initComments, userId, isLik
     window.location.href = '/'
   }
 
-  const commentsOpenAt = work.published_at ? new Date(new Date(work.published_at).getTime() + 24 * 60 * 60 * 1000) : null
-  const hoursLeft = commentsOpenAt ? Math.max(0, Math.ceil((commentsOpenAt.getTime() - Date.now()) / 3600000)) : 0
+  const commentsOpenAt = work.published_at
+    ? new Date(new Date(work.published_at).getTime() + 24 * 60 * 60 * 1000)
+    : null
+  const hoursLeft = commentsOpenAt
+    ? Math.max(0, Math.ceil((commentsOpenAt.getTime() - Date.now()) / 3600000))
+    : 0
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg)' }}>
@@ -115,8 +120,10 @@ export default function WerkClient({ work, comments: initComments, userId, isLik
             )}
 
             <div className="flex items-center gap-4 mb-8 pb-8 border-b border-line">
-              <button onClick={toggleLike}
-                className={`w-11 h-11 border flex items-center justify-center text-base transition-all ${liked ? 'bg-ink text-bg border-ink' : 'border-line text-soft hover:border-ink hover:text-ink'}`}>
+              <button
+                onClick={toggleLike}
+                className={`w-11 h-11 border flex items-center justify-center text-base transition-all ${liked ? 'bg-ink text-bg border-ink' : 'border-line text-soft hover:border-ink hover:text-ink'}`}
+              >
                 {liked ? '♥' : '♡'}
               </button>
               <span className="text-xs text-soft">{count} mal geschätzt</span>
@@ -134,12 +141,14 @@ export default function WerkClient({ work, comments: initComments, userId, isLik
                     alert('Link kopiert ✓')
                   }
                 }}
-                className="ml-auto text-xs tracking-widest uppercase px-4 py-2 border border-line text-soft hover:border-ink hover:text-ink transition-all">
+                className="ml-auto text-xs tracking-widest uppercase px-4 py-2 border border-line text-soft hover:border-ink hover:text-ink transition-all"
+              >
                 Teilen
               </button>
             </div>
 
             <div className="text-xs tracking-widest uppercase text-soft mb-5">Kommentare</div>
+
             {!commentsOpen ? (
               <div className="flex flex-col items-center gap-4 py-6 text-center">
                 <KoalaSVG />
@@ -155,16 +164,62 @@ export default function WerkClient({ work, comments: initComments, userId, isLik
                   {comments.map(c => (
                     <div key={c.id} className="border-l-2 border-line pl-4">
                       <p className="text-sm leading-relaxed text-ink mb-1.5">{c.body}</p>
-                      <p className="text-xs text-soft tracking-wide">{new Date(c.created_at).toLocaleDateString('de-DE', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                      <p className="text-xs text-soft tracking-wide">
+                        {new Date(c.created_at).toLocaleDateString('de-DE', { day: 'numeric', month: 'long', year: 'numeric' })}
+                      </p>
                     </div>
                   ))}
                 </div>
+
                 {userId ? (
                   <div className="border-t border-line pt-5">
                     <label className="text-xs tracking-widest uppercase text-soft mb-3 block">Dein Kommentar</label>
-                    <textarea value={body} onChange={e => setBody(e.target.value)}
-                      placeholder="Was beschäftigt dich an diesem Werk?" maxLength={160}
-                      className="w-full bg-transparent border border-line p-3 text-sm leading-relaxed outline-none resize-none h-24 focus:border-ink transition-colors placeholder:text-soft" />
+                    <textarea
+                      value={body}
+                      onChange={e => setBody(e.target.value)}
+                      placeholder="Was beschäftigt dich an diesem Werk?"
+                      maxLength={160}
+                      className="w-full bg-transparent border border-line p-3 text-sm leading-relaxed outline-none resize-none h-24 focus:border-ink transition-colors placeholder:text-soft"
+                    />
                     <div className="flex justify-between items-center mt-2">
                       <span className={`text-xs ${remaining < 0 ? 'text-red-500' : remaining <= 20 ? 'text-amber-600' : 'text-soft'}`}>
-                        {remaining < 0 ?
+                        {remaining < 0 ? `${Math.abs(remaining)} zu viel` : `${remaining} übrig`}
+                      </span>
+                      <button
+                        onClick={submitComment}
+                        disabled={submitting || remaining < 0 || body.trim().length === 0}
+                        className="text-xs tracking-widest uppercase px-4 py-2 border border-line text-soft hover:border-ink hover:text-ink transition-all disabled:opacity-30"
+                      >
+                        {submitting ? '…' : 'Senden'}
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <Link href="/auth/login" className="text-xs text-soft hover:text-ink transition-colors">
+                    Einloggen um zu kommentieren →
+                  </Link>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function KoalaSVG() {
+  return (
+    <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="24" cy="26" r="14" fill="#e8e4de" />
+      <circle cx="10" cy="20" r="7" fill="#dedad5" />
+      <circle cx="38" cy="20" r="7" fill="#dedad5" />
+      <circle cx="10" cy="20" r="4" fill="#c5c0ba" />
+      <circle cx="38" cy="20" r="4" fill="#c5c0ba" />
+      <circle cx="20" cy="24" r="2.5" fill="#9a9690" />
+      <circle cx="28" cy="24" r="2.5" fill="#9a9690" />
+      <ellipse cx="24" cy="29" rx="4" ry="2.5" fill="#c5c0ba" />
+      <path d="M20 34 Q24 37 28 34" stroke="#9a9690" strokeWidth="1.2" strokeLinecap="round" fill="none" />
+    </svg>
+  )
+}
