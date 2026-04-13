@@ -83,11 +83,15 @@ export default function FeedClient({ initialWorks, favoriteIds, likedIds, userId
                 </Link>
               )}
               {userSlug && (
-                <Link href="/upload" onClick={() => setMenuOpen(false)}
-                  className="block px-4 py-3 text-xs tracking-widest uppercase text-soft hover:text-ink hover:bg-line/30 transition-colors no-underline">
-                  Werk hochladen
-                </Link>
-              )}
+  <Link href="/upload" onClick={() => setMenuOpen(false)} className="block px-4 py-3 text-xs tracking-widest uppercase text-soft hover:text-ink hover:bg-line/30 transition-colors no-underline">
+    Werk hochladen
+  </Link>
+)}
+{userSlug && (
+  <Link href="/newsletter/neu" onClick={() => setMenuOpen(false)} className="block px-4 py-3 text-xs tracking-widest uppercase text-soft hover:text-ink hover:bg-line/30 transition-colors no-underline">
+    Newsletter
+  </Link>
+)}
               <div className="border-t border-line" />
               <button onClick={signOut}
                 className="w-full text-left px-4 py-3 text-xs tracking-widest uppercase text-soft hover:text-ink hover:bg-line/30 transition-colors">
