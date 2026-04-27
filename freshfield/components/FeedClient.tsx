@@ -77,29 +77,29 @@ export default function FeedClient({ initialWorks, favoriteIds, likedIds, userId
           {menuOpen && (
             <div className="absolute right-0 top-8 border border-line z-50 min-w-[160px]" style={{ background: 'var(--bg)' }}>
               {userSlug && (
-                <Link href={`/profil/${userSlug}`} onClick={() => setMenuOpen(false)}
-                  className="block px-4 py-3 text-xs tracking-widest uppercase text-soft hover:text-ink hover:bg-line/30 transition-colors no-underline">
+                <Link href={`/profil/${userSlug}`} onClick={() => setMenuOpen(false)} className="block px-4 py-3 text-xs tracking-widest uppercase text-soft hover:text-ink hover:bg-line/30 transition-colors no-underline">
                   Mein Profil
                 </Link>
               )}
               {userSlug && (
-  <Link href="/upload" onClick={() => setMenuOpen(false)} className="block px-4 py-3 text-xs tracking-widest uppercase text-soft hover:text-ink hover:bg-line/30 transition-colors no-underline">
-    Werk hochladen
-  </Link>
-)}
-{userSlug && (
-  <Link href="/newsletter/neu" onClick={() => setMenuOpen(false)} className="block px-4 py-3 text-xs tracking-widest uppercase text-soft hover:text-ink hover:bg-line/30 transition-colors no-underline">
-    Newsletter
-  </Link>
-)}
+                <Link href="/upload" onClick={() => setMenuOpen(false)} className="block px-4 py-3 text-xs tracking-widest uppercase text-soft hover:text-ink hover:bg-line/30 transition-colors no-underline">
+                  Werk hochladen
+                </Link>
+              )}
+              {userSlug && (
+                <Link href="/newsletter/neu" onClick={() => setMenuOpen(false)} className="block px-4 py-3 text-xs tracking-widest uppercase text-soft hover:text-ink hover:bg-line/30 transition-colors no-underline">
+                  Newsletter
+                </Link>
+              )}
+              <Link href="/mein-profil" onClick={() => setMenuOpen(false)} className="block px-4 py-3 text-xs tracking-widest uppercase text-soft hover:text-ink hover:bg-line/30 transition-colors no-underline">
+                Meine Favoriten
+              </Link>
               <div className="border-t border-line" />
-              <button onClick={signOut}
-                className="w-full text-left px-4 py-3 text-xs tracking-widest uppercase text-soft hover:text-ink hover:bg-line/30 transition-colors">
+              <button onClick={signOut} className="w-full text-left px-4 py-3 text-xs tracking-widest uppercase text-soft hover:text-ink hover:bg-line/30 transition-colors">
                 Ausloggen
               </button>
               {userId === ADMIN_ID && (
-                <Link href="/admin" onClick={() => setMenuOpen(false)}
-                  className="block px-4 py-3 text-xs tracking-widest uppercase text-soft hover:text-ink hover:bg-line/30 transition-colors no-underline border-t border-line">
+                <Link href="/admin" onClick={() => setMenuOpen(false)} className="block px-4 py-3 text-xs tracking-widest uppercase text-soft hover:text-ink hover:bg-line/30 transition-colors no-underline border-t border-line">
                   Admin
                 </Link>
               )}
@@ -111,13 +111,11 @@ export default function FeedClient({ initialWorks, favoriteIds, likedIds, userId
       <div className="px-10 py-3 border-b border-line flex gap-3 flex-wrap">
         <span className="text-xs text-soft self-center mr-2">{filtered.length} Werke</span>
         {(['all', 'image', 'audio', 'video'] as const).map(m => (
-          <button key={m} onClick={() => setMedium(m)}
-            className={`text-xs tracking-widest uppercase px-3 py-1.5 border transition-all ${medium === m ? 'border-ink text-ink' : 'border-line text-soft hover:border-ink hover:text-ink'}`}>
+          <button key={m} onClick={() => setMedium(m)} className={`text-xs tracking-widest uppercase px-3 py-1.5 border transition-all ${medium === m ? 'border-ink text-ink' : 'border-line text-soft hover:border-ink hover:text-ink'}`}>
             {m === 'all' ? 'Alles' : m === 'image' ? 'Bild' : m === 'audio' ? 'Audio' : 'Video'}
           </button>
         ))}
-        <button onClick={() => setPool(pool === 'all' ? 'fav' : 'all')}
-          className={`text-xs tracking-widest uppercase px-3 py-1.5 border transition-all ml-auto ${pool === 'fav' ? 'border-ink text-ink' : 'border-line text-soft hover:border-ink hover:text-ink'}`}>
+        <button onClick={() => setPool(pool === 'all' ? 'fav' : 'all')} className={`text-xs tracking-widest uppercase px-3 py-1.5 border transition-all ml-auto ${pool === 'fav' ? 'border-ink text-ink' : 'border-line text-soft hover:border-ink hover:text-ink'}`}>
           {pool === 'fav' ? '✓ Von Favorisierten' : 'Von Favorisierten'}
         </button>
       </div>
