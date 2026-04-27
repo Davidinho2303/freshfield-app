@@ -13,8 +13,25 @@ export default function BewerbenPage() {
   async function submit() {
     if (!email.trim() || !message.trim()) return
     setLoading(true)
+
     const supabase = createClient()
-    await supabase.from('applications').insert({ email: email.trim(), message: message.trim() })
+
+    // Bewerbung immer speichern (Aufzeichnung)
+    const { data: application } = await supabase
+      .from('applications')
+      .insert({ email: email.trim(), message: message.trim() })
+      .select('id')
+      .single()
+
+    // Auto-Approve wenn Flag gesetzt
+    if (process.env.NEXT_PUBLIC_AUTO_APPROVE === 'true' && application?.id) {
+      await fetch('/api/admin/approve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ applicationId: application.id, email: email.trim() }),
+      })
+    }
+
     setDone(true)
     setLoading(false)
   }
@@ -33,7 +50,11 @@ export default function BewerbenPage() {
         {done ? (
           <div className="flex flex-col gap-4">
             <p className="font-serif text-3xl">Danke.</p>
-            <p className="text-sm text-soft leading-relaxed">Wir haben deine Bewerbung erhalten und melden uns per E-Mail.</p>
+            <p className="text-sm text-soft leading-relaxed">
+              {process.env.NEXT_PUBLIC_AUTO_APPROVE === 'true'
+                ? 'Du wurdest aufgenommen. Schau in dein Postfach – dort findest du deinen Login-Link.'
+                : 'Wir haben deine Bewerbung erhalten und melden uns per E-Mail.'}
+            </p>
           </div>
         ) : (
           <>
