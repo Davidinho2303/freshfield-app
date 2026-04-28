@@ -1,5 +1,4 @@
 'use client'
-
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
@@ -82,52 +81,72 @@ export default function ProfileClient({ profile, works, userId, isFavorited: ini
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg)', color: 'var(--ink)' }}>
-      <header className="sticky top-0 z-40 px-10 py-5 flex justify-between items-center border-b border-line backdrop-blur-md" style={{ background: 'rgba(247,245,242,.85)' }}>
+      <header className="sticky top-0 z-40 px-5 md:px-10 py-5 flex justify-between items-center border-b border-line backdrop-blur-md" style={{ background: 'rgba(247,245,242,.85)' }}>
         <Link href="/feed" className="flex items-center gap-2 no-underline">
           <HalmIcon variant="light" />
           <span className="logo-text text-ink">Freshfield</span>
         </Link>
-        <div className="flex items-center gap-8">
+        <div className="flex items-center gap-4 md:gap-8">
           <Link href="/feed" className="text-xs text-soft tracking-widest uppercase hover:text-ink transition-colors">← Entdecken</Link>
           {userId && (
-            <button onClick={signOut} className="text-xs text-soft tracking-widest uppercase hover:text-ink transition-colors">
+            <button onClick={signOut} className="text-xs text-soft tracking-widest uppercase hover:text-ink transition-colors hidden sm:block">
               Ausloggen
             </button>
           )}
         </div>
       </header>
 
-      <div className="px-10 pt-12 pb-0 flex items-start gap-8">
+      {/* Profil-Header: mobile gestapelt, desktop nebeneinander */}
+      <div className="px-5 md:px-10 pt-8 md:pt-12 pb-0 flex flex-col sm:flex-row sm:items-start gap-5 md:gap-8">
         {profile.avatar_url ? (
-          <img src={profile.avatar_url} alt="" className="w-20 h-20 rounded-full object-cover border border-line flex-shrink-0" />
+          <img src={profile.avatar_url} alt="" className="w-16 h-16 md:w-20 md:h-20 rounded-full object-cover border border-line flex-shrink-0" />
         ) : (
-          <div className="w-20 h-20 rounded-full border border-line flex-shrink-0 flex items-center justify-center text-2xl font-serif text-soft">
+          <div className="w-16 h-16 md:w-20 md:h-20 rounded-full border border-line flex-shrink-0 flex items-center justify-center text-2xl font-serif text-soft">
             {profile.name[0]}
           </div>
         )}
-        <div className="flex-1 pt-1">
-          <h1 className="text-2xl font-normal mb-2">{profile.name}</h1>
+        <div className="flex-1">
+          <h1 className="text-xl md:text-2xl font-normal mb-2">{profile.name}</h1>
           {profile.bio && <p className="text-sm leading-relaxed text-[#5a5855] max-w-lg mb-3">{profile.bio}</p>}
           <div className="text-xs text-soft tracking-wide">{works.length} Werke · {subscriberCount} Newsletter-Abonnenten</div>
         </div>
-        <div className="relative pt-1 flex-shrink-0">
-          <button onClick={() => setMenuOpen(o => !o)} className="text-xs tracking-widest uppercase px-4 py-2 border border-line text-soft hover:border-ink hover:text-ink transition-all flex items-center gap-2">
+        {/* Behalten-Button: auf Mobile unter dem Text */}
+        <div className="relative sm:pt-1 flex-shrink-0">
+          <button
+            onClick={() => setMenuOpen(o => !o)}
+            className="text-xs tracking-widest uppercase px-4 py-2 border border-line text-soft hover:border-ink hover:text-ink transition-all flex items-center gap-2"
+          >
             Behalten <span className="text-[8px]">▾</span>
           </button>
           {menuOpen && (
             <div className="absolute right-0 top-full mt-1 bg-bg border border-line shadow-lg z-50 min-w-[220px] flex flex-col">
-              <button onClick={toggleFavorite} className="px-4 py-3 text-xs tracking-widest uppercase text-left border-b border-line hover:bg-black/5 transition-colors flex items-center gap-3" style={{ color: favorited ? 'var(--g1)' : 'var(--soft)' }}>
+              <button
+                onClick={toggleFavorite}
+                className="px-4 py-3 text-xs tracking-widest uppercase text-left border-b border-line hover:bg-black/5 transition-colors flex items-center gap-3"
+                style={{ color: favorited ? 'var(--g1)' : 'var(--soft)' }}
+              >
                 <span>{favorited ? '♥' : '♡'}</span>
                 {favorited ? 'Favorisiert' : 'Favorisieren'}
               </button>
               {!nlDone ? (
                 <>
-                  <button onClick={() => userEmail ? subscribeNewsletter() : setNlOpen(o => !o)} className="px-4 py-3 text-xs tracking-widest uppercase text-left border-b border-line hover:bg-black/5 transition-colors flex items-center gap-3 text-soft">
+                  <button
+                    onClick={() => userEmail ? subscribeNewsletter() : setNlOpen(o => !o)}
+                    className="px-4 py-3 text-xs tracking-widest uppercase text-left border-b border-line hover:bg-black/5 transition-colors flex items-center gap-3 text-soft"
+                  >
                     <span>✉</span> Newsletter
                   </button>
                   {nlOpen && !userEmail && (
                     <div className="px-4 py-3 border-b border-line flex flex-col gap-2">
-                      <input type="email" value={nlEmail} onChange={e => setNlEmail(e.target.value)} onKeyDown={e => e.key === 'Enter' && subscribeNewsletter()} placeholder="deine@mail.de" className="w-full bg-transparent border-b border-line text-xs py-1.5 outline-none placeholder:text-soft" autoFocus />
+                      <input
+                        type="email"
+                        value={nlEmail}
+                        onChange={e => setNlEmail(e.target.value)}
+                        onKeyDown={e => e.key === 'Enter' && subscribeNewsletter()}
+                        placeholder="deine@mail.de"
+                        className="w-full bg-transparent border-b border-line text-xs py-1.5 outline-none placeholder:text-soft"
+                        autoFocus
+                      />
                       <button onClick={subscribeNewsletter} className="self-end text-xs tracking-widest uppercase bg-ink text-bg px-3 py-1.5">Abonnieren</button>
                       <span className="text-[10px] text-soft">Kein Account nötig.</span>
                     </div>
@@ -147,7 +166,7 @@ export default function ProfileClient({ profile, works, userId, isFavorited: ini
       </div>
 
       {isOwner && (
-        <div className="px-10 mt-10">
+        <div className="px-5 md:px-10 mt-8 md:mt-10">
           <div className="flex items-center justify-between mb-4">
             <span className="text-xs uppercase tracking-widest text-soft">Newsletter</span>
             <Link href="/newsletter/neu" className="text-xs uppercase tracking-widest text-[#2d6a2d] border border-[#2d6a2d] px-3 py-1.5 hover:bg-[#2d6a2d] hover:text-white transition-colors no-underline">+ Neu</Link>
@@ -157,16 +176,18 @@ export default function ProfileClient({ profile, works, userId, isFavorited: ini
           ) : (
             <div className="flex flex-col gap-2 pb-6 border-b border-line">
               {drafts.map(draft => (
-                <div key={draft.id} className="flex items-center justify-between border border-[#e8e4de] px-4 py-3 bg-white">
-                  <div>
-                    <p className="text-sm text-[#1a1a18]">{draft.subject || <span className="text-[#c5c0ba]">Kein Betreff</span>}</p>
+                <div key={draft.id} className="flex items-center justify-between border border-[#e8e4de] px-4 py-3 bg-white gap-3">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-[#1a1a18] truncate">{draft.subject || <span className="text-[#c5c0ba]">Kein Betreff</span>}</p>
                     <p className="text-xs text-[#9a9690] mt-0.5">
-                      {draft.status === 'scheduled' ? `Geplant · ${new Date(draft.scheduled_for!).toLocaleDateString('de-DE')}` : 'Entwurf'}
+                      {draft.status === 'scheduled'
+                        ? `Geplant · ${new Date(draft.scheduled_for!).toLocaleDateString('de-DE')}`
+                        : 'Entwurf'}
                       {' · '}
                       {new Date(draft.updated_at).toLocaleDateString('de-DE', { day: 'numeric', month: 'long' })}
                     </p>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 flex-shrink-0">
                     <Link href={`/newsletter/${draft.id}/bearbeiten`} className="text-xs uppercase tracking-widest text-[#2d6a2d] hover:underline no-underline">Bearbeiten</Link>
                     <button onClick={() => deleteDraft(draft.id)} className="text-xs text-[#9a9690] hover:text-red-400 transition-colors">×</button>
                   </div>
@@ -178,9 +199,13 @@ export default function ProfileClient({ profile, works, userId, isFavorited: ini
       )}
 
       {hasMultiple && (
-        <div className="flex gap-0 px-10 mt-8 border-b border-line">
+        <div className="flex gap-0 px-5 md:px-10 mt-8 border-b border-line">
           {(['image', 'audio'] as const).map(t => (
-            <button key={t} onClick={() => setTab(t)} className={`pb-3 mr-6 text-xs tracking-widest uppercase transition-all border-b-2 ${tab === t ? 'border-ink text-ink' : 'border-transparent text-soft hover:text-ink'}`}>
+            <button
+              key={t}
+              onClick={() => setTab(t)}
+              className={`pb-3 mr-6 text-xs tracking-widest uppercase transition-all border-b-2 ${tab === t ? 'border-ink text-ink' : 'border-transparent text-soft hover:text-ink'}`}
+            >
               {t === 'image' ? `Visuell (${imageWorks.length})` : `Audio (${audioWorks.length})`}
             </button>
           ))}
