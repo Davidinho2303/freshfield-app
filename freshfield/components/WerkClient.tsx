@@ -1,5 +1,4 @@
 'use client'
-
 import { useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
@@ -64,39 +63,49 @@ export default function WerkClient({ work, comments: initComments, userId, isLik
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg)' }}>
-      <header className="sticky top-0 z-40 px-10 py-5 flex justify-between items-center border-b border-line backdrop-blur-md" style={{ background: 'rgba(247,245,242,.92)' }}>
+      <header className="sticky top-0 z-40 px-5 md:px-10 py-5 flex justify-between items-center border-b border-line backdrop-blur-md" style={{ background: 'rgba(247,245,242,.92)' }}>
         <Link href="/feed" className="flex items-center gap-2 no-underline">
           <HalmIcon variant="light" />
           <span className="logo-text text-ink">Freshfield</span>
         </Link>
-        <div className="flex gap-8 text-xs tracking-widest uppercase text-soft">
+        <div className="flex gap-4 md:gap-8 text-xs tracking-widest uppercase text-soft">
           <Link href="/feed" className="hover:text-ink transition-colors">← Entdecken</Link>
           {work.profile && (
-            <Link href={`/profil/${work.profile.slug}`} className="hover:text-ink transition-colors">← Zum Profil</Link>
+            <Link href={`/profil/${work.profile.slug}`} className="hover:text-ink transition-colors hidden sm:block">← Profil</Link>
           )}
           {userId && (
-            <button onClick={signOut} className="hover:text-ink transition-colors">Ausloggen</button>
+            <button onClick={signOut} className="hover:text-ink transition-colors hidden sm:block">Ausloggen</button>
           )}
         </div>
       </header>
 
-      <div className="grid" style={{ gridTemplateColumns: '1fr 420px', minHeight: 'calc(100vh - 57px)' }}>
-        <div className="sticky top-14 flex items-center justify-center overflow-hidden" style={{ background: 'var(--ink)', height: 'calc(100vh - 57px)' }}>
-          {work.file_type === 'image' && work.file_url ? (
-            <img src={work.file_url} alt={work.title ?? ''} className="w-full h-full object-contain" />
-          ) : work.file_type === 'audio' ? (
-            <div className="flex flex-col items-center gap-6 p-12 w-full max-w-sm">
-              <p className="font-serif text-2xl text-bg text-center">{work.title ?? 'Ohne Titel'}</p>
-              <div className="w-full h-0.5 bg-white/10 rounded" />
-              <p className="text-xs text-white/40 tracking-widest uppercase">Audio</p>
-            </div>
-          ) : (
-            <div className="text-white/20 text-6xl">▶</div>
-          )}
+      {/* Mobile: gestapelt. Desktop: Side-by-Side */}
+      <div className="flex flex-col md:grid" style={{ gridTemplateColumns: '1fr 420px' }}>
+
+        {/* Werk-Anzeige */}
+        <div
+          className="flex items-center justify-center overflow-hidden md:sticky md:top-14"
+          style={{ background: 'var(--ink)', minHeight: '50vw', height: undefined }}
+        >
+          <style>{`@media (min-width: 768px) { .werk-media-box { height: calc(100vh - 57px) !important; } }`}</style>
+          <div className="werk-media-box w-full flex items-center justify-center" style={{ minHeight: '50vw' }}>
+            {work.file_type === 'image' && work.file_url ? (
+              <img src={work.file_url} alt={work.title ?? ''} className="w-full h-full object-contain" />
+            ) : work.file_type === 'audio' ? (
+              <div className="flex flex-col items-center gap-6 p-8 md:p-12 w-full max-w-sm">
+                <p className="font-serif text-xl md:text-2xl text-bg text-center">{work.title ?? 'Ohne Titel'}</p>
+                <div className="w-full h-0.5 bg-white/10 rounded" />
+                <p className="text-xs text-white/40 tracking-widest uppercase">Audio</p>
+              </div>
+            ) : (
+              <div className="text-white/20 text-6xl">▶</div>
+            )}
+          </div>
         </div>
 
-        <div className="border-l border-line flex flex-col overflow-y-auto" style={{ height: 'calc(100vh - 57px)' }}>
-          <div className="p-10 flex flex-col gap-0">
+        {/* Info & Kommentare */}
+        <div className="border-t md:border-t-0 md:border-l border-line flex flex-col overflow-y-auto" style={{}}>
+          <div className="p-6 md:p-10 flex flex-col gap-0">
             {work.profile && (
               <Link href={`/profil/${work.profile.slug}`} className="flex items-center gap-3 pb-6 mb-6 border-b border-line no-underline group">
                 {work.profile.avatar_url ? (
@@ -111,7 +120,7 @@ export default function WerkClient({ work, comments: initComments, userId, isLik
               </Link>
             )}
 
-            {work.title && <h1 className="font-serif text-4xl font-normal leading-tight mb-2">{work.title}</h1>}
+            {work.title && <h1 className="font-serif text-3xl md:text-4xl font-normal leading-tight mb-2">{work.title}</h1>}
             {(work.medium || work.year) && (
               <p className="text-xs tracking-widest uppercase text-soft mb-6">{[work.medium, work.year].filter(Boolean).join(' · ')}</p>
             )}
@@ -170,7 +179,6 @@ export default function WerkClient({ work, comments: initComments, userId, isLik
                     </div>
                   ))}
                 </div>
-
                 {userId ? (
                   <div className="border-t border-line pt-5">
                     <label className="text-xs tracking-widest uppercase text-soft mb-3 block">Dein Kommentar</label>
