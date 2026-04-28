@@ -62,7 +62,7 @@ export default function FeedClient({ initialWorks, favoriteIds, likedIds, userId
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg)' }}>
-      <header className="sticky top-0 z-40 px-10 py-5 flex justify-between items-center border-b border-line backdrop-blur-md" style={{ background: 'rgba(247,245,242,.92)' }}>
+      <header className="sticky top-0 z-40 px-5 md:px-10 py-5 flex justify-between items-center border-b border-line backdrop-blur-md" style={{ background: 'rgba(247,245,242,.92)' }}>
         <Link href="/feed" className="flex items-center gap-2 no-underline">
           <HalmIcon variant="light" />
           <span className="logo-text text-ink">Freshfield</span>
@@ -108,15 +108,22 @@ export default function FeedClient({ initialWorks, favoriteIds, likedIds, userId
         </div>
       </header>
 
-      <div className="px-10 py-3 border-b border-line flex gap-3 flex-wrap">
-        <span className="text-xs text-soft self-center mr-2">{filtered.length} Werke</span>
+      <div className="px-5 md:px-10 py-3 border-b border-line flex gap-2 flex-wrap">
+        <span className="text-xs text-soft self-center mr-1">{filtered.length} Werke</span>
         {(['all', 'image', 'audio', 'video'] as const).map(m => (
-          <button key={m} onClick={() => setMedium(m)} className={`text-xs tracking-widest uppercase px-3 py-1.5 border transition-all ${medium === m ? 'border-ink text-ink' : 'border-line text-soft hover:border-ink hover:text-ink'}`}>
+          <button
+            key={m}
+            onClick={() => setMedium(m)}
+            className={`text-xs tracking-widest uppercase px-2.5 py-1.5 border transition-all ${medium === m ? 'border-ink text-ink' : 'border-line text-soft hover:border-ink hover:text-ink'}`}
+          >
             {m === 'all' ? 'Alles' : m === 'image' ? 'Bild' : m === 'audio' ? 'Audio' : 'Video'}
           </button>
         ))}
-        <button onClick={() => setPool(pool === 'all' ? 'fav' : 'all')} className={`text-xs tracking-widest uppercase px-3 py-1.5 border transition-all ml-auto ${pool === 'fav' ? 'border-ink text-ink' : 'border-line text-soft hover:border-ink hover:text-ink'}`}>
-          {pool === 'fav' ? '✓ Von Favorisierten' : 'Von Favorisierten'}
+        <button
+          onClick={() => setPool(pool === 'all' ? 'fav' : 'all')}
+          className={`text-xs tracking-widest uppercase px-2.5 py-1.5 border transition-all ml-auto ${pool === 'fav' ? 'border-ink text-ink' : 'border-line text-soft hover:border-ink hover:text-ink'}`}
+        >
+          {pool === 'fav' ? '✓ Favoriten' : 'Favoriten'}
         </button>
       </div>
 
