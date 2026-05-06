@@ -36,23 +36,6 @@ export async function POST(req: Request) {
       })
     }
 
-    // Magic Link generieren
-    let magicLink = 'https://freshfield.cloud/auth/login'
-    try {
-      const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({
-        type: 'magiclink',
-        email,
-        options: {
-          redirectTo: 'https://freshfield.cloud/auth/callback?next=/profil/setup'
-        }
-      })
-      if (!linkError && linkData?.properties?.action_link) {
-        magicLink = linkData.properties.action_link
-      }
-    } catch (e) {
-      console.error('generateLink failed:', e)
-    }
-
     // Mail senden
     const { error: mailError } = await resend.emails.send({
       from: 'Freshfield <hallo@freshfield.cloud>',
@@ -61,8 +44,9 @@ export async function POST(req: Request) {
       html: `
         <p>Hallo,</p>
         <p>deine Bewerbung bei Freshfield wurde angenommen.</p>
-        <p>Klick auf den Link unten um dich einzuloggen und dein Profil einzurichten:</p>
-        <p><a href="${magicLink}">Jetzt einloggen & Profil einrichten →</a></p>
+        <p>Logge dich ein um dein Profil einzurichten:</p>
+        <p><a href="https://freshfield.cloud/auth/login">Jetzt einloggen →</a></p>
+        <p>Gib dort deine E-Mail-Adresse ein – du bekommst einen Login-Link zugeschickt.</p>
         <p>Freshfield</p>
       `
     })
