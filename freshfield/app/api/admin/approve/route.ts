@@ -10,10 +10,21 @@ export async function POST(req: Request) {
     )
     const resend = new Resend(process.env.RESEND_API_KEY)
 
-    const { applicationId, email } = await req.json()
+    const { applicationId, email, message } = await req.json()
 
-    await supabase.from('applications').update({ status: 'approved' }).eq('id', applicationId)
+    // Bewerbung speichern oder updaten (server-seitig, umgeht RLS)
+    if (applicationId) {
+      await supabase
+        .from('applications')
+        .update({ status: 'approved' })
+        .eq('id', applicationId)
+    } else if (message) {
+      await supabase
+        .from('applications')
+        .insert({ email: email.trim(), message: message.trim(), status: 'approved' })
+    }
 
+    // User anlegen falls nicht vorhanden
     const { data: existing } = await supabase.auth.admin.listUsers()
     const userExists = existing.users.find((u: any) => u.email === email)
 
@@ -25,7 +36,7 @@ export async function POST(req: Request) {
       })
     }
 
-    // Magic Link generieren (Fallback auf Login-Seite)
+    // Magic Link generieren
     let magicLink = 'https://freshfield.cloud/auth/login'
     try {
       const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({
@@ -42,6 +53,7 @@ export async function POST(req: Request) {
       console.error('generateLink failed:', e)
     }
 
+    // Mail senden
     const { error: mailError } = await resend.emails.send({
       from: 'Freshfield <hallo@freshfield.cloud>',
       to: email,
